@@ -1,5 +1,6 @@
 package com.example.product.dtos.products;
 
+import com.example.product.models.Category;
 import com.example.product.models.Product;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,11 @@ public class CreateProductRequestDto
         product.setPrice(this.price);
         product.setDescription(this.description);
         product.setImageurl(this.imageurl);
-        product.setCategoryName(this.categoryName);
+
+        Category category = new Category();
+        category.setName(categoryName);
+
+        product.setCategory(category);
 
         return product;
     }

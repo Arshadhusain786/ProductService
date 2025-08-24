@@ -43,15 +43,19 @@ public class ProductController
       return response;
     }
     @GetMapping("/{id}")
-    public String getSingleProduct(@PathVariable("id") Long id)
+    public GetProductResponseDto getSingleProduct(@PathVariable("id") Long id)
     {
-        return "here is your product"+id;
+        Product product = productService.getSingleProduct(id);
 
+        GetProductResponseDto response = new GetProductResponseDto();
+        response.setProduct(GetProductDto.from(product)); // convert entity → DTO
+
+        return response;
     }
     @DeleteMapping("/{id}")
-    public void deleteProduct()
+    public String  deleteProduct(@PathVariable Long id)
     {
-
+        return productService.deleteProduct(id);
     }
     @PatchMapping("/{id}")
     public PatchProductResponseDto updateproduct(@PathVariable Long productId ,
@@ -64,10 +68,18 @@ public class ProductController
 
         return response;
     }
-    public void replaceProduct()
-    {
+    @PutMapping("/{id}")
+    public GetProductResponseDto replaceProduct(
+            @PathVariable Long id,
+            @RequestBody CreateProductRequestDto requestDto) {
 
+        Product updatedProduct = productService.replaceProduct(id,requestDto);
+
+        GetProductResponseDto response = new GetProductResponseDto();
+        response.setProduct(GetProductDto.from(updatedProduct));
+        return response;
     }
+
 //    @ExceptionHandler(RuntimeException.class)
 //    public ErrorResponseDto handleRuntimeException(RuntimeException e)
 //    {

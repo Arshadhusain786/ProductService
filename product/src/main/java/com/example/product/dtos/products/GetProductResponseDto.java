@@ -1,5 +1,6 @@
 package com.example.product.dtos.products;
 
+import com.example.product.models.Product;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class GetProductResponseDto
 {
-    private GetProductResponseDto product;
+    private GetProductDto product;
+
 
 }

@@ -1,5 +1,6 @@
 package com.example.product.dtos.fakestore;
 
+import com.example.product.models.Category;
 import com.example.product.models.Product;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +18,7 @@ public class FakeStoreCreateProductRequestDto
     {
         FakeStoreCreateProductRequestDto fakeStoreCreateProductRequestDto = new FakeStoreCreateProductRequestDto();
         fakeStoreCreateProductRequestDto.title= product.getTitle();
-        fakeStoreCreateProductRequestDto.category= product.getCategoryName();
+        fakeStoreCreateProductRequestDto.category= (product.getCategory()).getName();
         fakeStoreCreateProductRequestDto.image= product.getImageurl();
         fakeStoreCreateProductRequestDto.description= product.getDescription();
         fakeStoreCreateProductRequestDto.price= product.getPrice();

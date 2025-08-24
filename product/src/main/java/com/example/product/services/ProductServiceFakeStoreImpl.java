@@ -2,6 +2,7 @@ package com.example.product.services;
 
 import com.example.product.dtos.fakestore.FakeStoreCreateProductRequestDto;
 import com.example.product.dtos.fakestore.FakeStoreGetProductResponseDto;
+import com.example.product.dtos.products.CreateProductRequestDto;
 import com.example.product.models.Product;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -27,7 +28,7 @@ public class ProductServiceFakeStoreImpl implements ProductService
     public Product createProduct(Product product)
     {
         FakeStoreCreateProductRequestDto fakeStoreCreateProductRequestDto=new FakeStoreCreateProductRequestDto();
-        fakeStoreCreateProductRequestDto.setCategory(product.getCategoryName());
+        fakeStoreCreateProductRequestDto.setCategory(product.getCategory().getName());
         fakeStoreCreateProductRequestDto.setTitle(product.getTitle());
         fakeStoreCreateProductRequestDto.setImage(product.getImageurl());
         fakeStoreCreateProductRequestDto.setDescription(product.getDescription());
@@ -73,5 +74,32 @@ public class ProductServiceFakeStoreImpl implements ProductService
         return  productResponseDto.toProduct();
     }
 
+    @Override
+    public Product getSingleProduct(Long productId) {
+        return restTemplate.getForObject(
+                "https://fakestoreapi.com/products/{id}",
+                Product.class,
+                productId
+        );
+    }
+    @Override
+    public String deleteProduct(Long productId) {
+        String url = "https://fakestoreapi.com/products/{id}";
+        restTemplate.delete(url, productId);
+        return "Product with ID " + productId + " deleted successfully!";
+    }
+
+    @Override
+    public Product replaceProduct(Long id, CreateProductRequestDto requestDto) {
+        String url = "https://fakestoreapi.com/products/{id}";
+
+        return restTemplate.exchange(
+                url,
+                HttpMethod.PUT,
+                new HttpEntity<>(requestDto), // request body
+                Product.class,
+                id
+        ).getBody();
+    }
 
 }
