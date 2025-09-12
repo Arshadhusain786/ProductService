@@ -7,14 +7,27 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateProductRequestDto
+public class CreateProductDto
 {
+    private Long id;
     private String title;
     private String description;
-    private double price;
+    private Double price;
     private String imageurl;
-    private String categoryName;
+    private String category;
 
+    public static CreateProductDto fromProduct(Product product)
+    {
+        CreateProductDto responseDto= new CreateProductDto();
+        responseDto.setId(product.getId());
+        responseDto.setImageurl(product.getImageurl());
+        responseDto.setDescription(product.getDescription());
+        responseDto.setPrice(product.getPrice());
+        responseDto.setTitle(product.getTitle());
+
+        return responseDto;
+
+    }
     public Product toProduct()
     {
         Product product = new Product();
@@ -22,11 +35,9 @@ public class CreateProductRequestDto
         product.setPrice(this.price);
         product.setDescription(this.description);
         product.setImageurl(this.imageurl);
-
         Category category = new Category();
-        category.setName(categoryName);
-
         product.setCategory(category);
+
 
         return product;
     }

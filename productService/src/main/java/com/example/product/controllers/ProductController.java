@@ -2,6 +2,7 @@ package com.example.product.controllers;
 
 import com.example.product.dtos.ErrorResponseDto;
 import com.example.product.dtos.products.*;
+import com.example.product.exceptions.ProductNotFoundException;
 import com.example.product.models.Product;
 import com.example.product.services.ProductService;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,7 +16,7 @@ import java.util.List;
 public class ProductController
 {
     private ProductService productService;
-    public ProductController(@Qualifier("fakestoreProductservice") ProductService productService)
+    public ProductController(@Qualifier("dbProductService") ProductService productService)
     {
         this.productService=productService;
     }
@@ -58,9 +59,8 @@ public class ProductController
         return productService.deleteProduct(id);
     }
     @PatchMapping("/{id}")
-    public PatchProductResponseDto updateproduct(@PathVariable Long productId ,
-                                                 @RequestBody CreateProductDto productDto)
-    {
+    public PatchProductResponseDto updateproduct(@PathVariable("id") Long productId ,
+                                                 @RequestBody CreateProductDto productDto) throws ProductNotFoundException {
         Product product = productService.partialUpdateProduct(productId, productDto.toProduct());
         PatchProductResponseDto response = new PatchProductResponseDto();
         response.setProduct(GetProductDto.from(product));
