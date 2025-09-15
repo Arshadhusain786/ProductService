@@ -1,6 +1,8 @@
 package com.example.product.repositories;
 
 import com.example.product.models.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -30,5 +32,10 @@ public interface ProductRepository extends JpaRepository<Product,Long>
 
     List<Product>
     findAllByCategory_subcategory_surnameEquals(String subcategorySurname);
+
+    List<Product>findByTitleContaining(String query);
+
+    Page<Product> findAllByTitleContainingAndCategory_id(
+            String title, Long categoryId, Pageable pageable);
 
 }
