@@ -12,7 +12,7 @@ public interface ProductService
    Product createProduct(Product product);
    List<Product> getAllProducts();
    Product partialUpdateProduct(Long productId,Product product) throws ProductNotFoundException;
-   Product getSingleProduct(Long productId);
+   Product getSingleProduct(Long productId) throws ProductNotFoundException;
    String deleteProduct(Long id);
    Product replaceProduct(Long id, CreateProductRequestDto requestDto);
 }

@@ -7,6 +7,7 @@ import com.example.product.models.Product;
 import com.example.product.services.ProductService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +16,26 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController
 {
+    private RestTemplate restTemplate;
     private ProductService productService;
-    public ProductController(@Qualifier("dbProductService") ProductService productService)
+    public ProductController(@Qualifier("fakestoreProductservice") ProductService productService
+    ,RestTemplate restTemplate)
     {
         this.productService=productService;
+        this.restTemplate=restTemplate;
     }
     @PostMapping("")
-    public CreateProductResponseDto createProduct(@RequestBody CreateProductRequestDto createProductRequestDto)
+    public CreateProductResponseDto createProduct(@RequestHeader("Authorization") String token,@RequestBody CreateProductRequestDto createProductRequestDto)
     {
+        // you can only create product if you are logged in
+        Boolean isAuthenticated = restTemplate.getForObject(
+                "http://userService/auth/validate?token="+token,
+                Boolean.class
+        );
+        if(!isAuthenticated)
+        {
+            return null;
+        }
         // converting request dto to entity
         Product product = productService.createProduct(createProductRequestDto.toProduct());
 
@@ -44,8 +57,7 @@ public class ProductController
       return response;
     }
     @GetMapping("/{id}")
-    public GetProductResponseDto getSingleProduct(@PathVariable("id") Long id)
-    {
+    public GetProductResponseDto getSingleProduct(@PathVariable("id") Long id) throws ProductNotFoundException {
         Product product = productService.getSingleProduct(id);
 
         GetProductResponseDto response = new GetProductResponseDto();

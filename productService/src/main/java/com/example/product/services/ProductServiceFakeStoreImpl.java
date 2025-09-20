@@ -3,7 +3,9 @@ package com.example.product.services;
 import com.example.product.dtos.fakestore.FakeStoreCreateProductRequestDto;
 import com.example.product.dtos.fakestore.FakeStoreGetProductResponseDto;
 import com.example.product.dtos.products.CreateProductRequestDto;
+import com.example.product.exceptions.ProductNotFoundException;
 import com.example.product.models.Product;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +22,12 @@ import java.util.stream.Stream;
 public class ProductServiceFakeStoreImpl implements ProductService
 {
     private RestTemplate restTemplate;
-    public ProductServiceFakeStoreImpl(RestTemplate restTemplate)
+    private RedisTemplate<String,Object> redisTemplate;
+
+    public ProductServiceFakeStoreImpl(RestTemplate restTemplate,RedisTemplate redisTemplate)
     {
         this.restTemplate=restTemplate;
+        this.redisTemplate=redisTemplate;
     }
     @Override
     public Product createProduct(Product product)
@@ -75,12 +80,36 @@ public class ProductServiceFakeStoreImpl implements ProductService
     }
 
     @Override
-    public Product getSingleProduct(Long productId) {
-        return restTemplate.getForObject(
-                "https://fakestoreapi.com/products/{id}",
-                Product.class,
-                productId
+    public Product getSingleProduct(Long productId) throws ProductNotFoundException
+    {
+        // check the prod is available in redis or not
+        Product product = (Product) redisTemplate.opsForHash().get("PRODUCTS","PRODUCTS_"+productId);
+        //cache hit
+        if(product!=null)
+        {
+            return product;
+        }
+        FakeStoreGetProductResponseDto responseDto =restTemplate.getForObject(
+                "https://fakestoreapi.com/products/"+productId,
+                FakeStoreGetProductResponseDto.class
         );
+        if(responseDto==null)
+        {
+            throw  new ProductNotFoundException("Product not exist with id"+productId);
+        }
+
+        product = responseDto.toProduct();
+
+        // Before returning product add it to redis
+        redisTemplate.opsForHash().put("PRODUCTS","PRODUCT_"+productId,product);
+
+//        return restTemplate.getForObject(
+//                "https://fakestoreapi.com/products/{id}",
+//                Product.class,
+//                productId
+
+        return product;
+
     }
     @Override
     public String deleteProduct(Long productId) {

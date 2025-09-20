@@ -8,7 +8,7 @@ import com.example.product.services.filteringService.FilterFactory;
 import com.example.product.services.sortingService.SorterFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +39,14 @@ public class SearchService
         products = SorterFactory.getSortedByCriteria(sortingCriteria)
                 .sort(products);
 
-           List<Product> productsOnPage = new ArrayList<>();
-        for(int i= pageSize*(pageNumber-1);i>=pageSize*pageNumber-1;++i)
-        {
-            productsOnPage.add(products.get(i));
-        }
+        int start = Math.min(pageSize * (pageNumber - 1), products.size());
+        int end = Math.min(start + pageSize, products.size());
+
+        List<Product> productsOnPage = products.subList(start, end);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-         return  new PageImpl<>(productsOnPage,pageable, products.size());
+        return new PageImpl<>(productsOnPage, pageable, products.size());
+
     }
     public Page<Product> simpleSearch(String query,
                                       Long categoryId,

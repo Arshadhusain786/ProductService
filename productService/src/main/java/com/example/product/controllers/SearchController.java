@@ -58,6 +58,6 @@ public class SearchController
                                           @RequestParam("sortingAttribute") String sortingAttribute
     )
     {
-
+        return  null;
     }
 }
